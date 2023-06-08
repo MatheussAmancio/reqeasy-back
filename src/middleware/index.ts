@@ -1,35 +1,26 @@
-import { NextFunction } from "express";
+import * as jwt from 'jsonwebtoken';
+import { AuthenticationTokenGenerateError } from "../exceptions/AuthenticationTokenGenerateError";
+import { AuthenticationTokenMissingException } from "../exceptions/AuthenticationTokenMissingException";
 
-const { verify } = require("jsonwebtoken");
-const AppError = require("../utils/AppError");
-const authConfig = require("../configs/auth");
 
-module.exports = function doFilterAuth() {
+async function doFilterAuth(req: any, res: any, next: any) {
 
-    return function (req:Request, res:Response, next:NextFunction) {
-        console.log(req.headers)
-        const authHeader = req.headers
+    const authHeader = req.headers['authorization']
+    console.log(authHeader)
+    if (!authHeader) {
+        throw new AuthenticationTokenMissingException();
+    }
 
-        if (!authHeader) {
-            throw new AppError("JWT Token uninformed", 401);
-        }
+    const [, token] = authHeader.split(" ");
 
-        const [, token] = authHeader.split(" ");
+    try {
+        const secret = process.env.SECRET_KEY || 'ASD!@AsD'
+        const jwtVerify = jwt.verify(token, secret);
 
-        try {
-            const { user_id, is_admin } = verify(token, authConfig.jwt.secret);
-
-            if (shouldIsAdmin && !Boolean(is_admin)) {
-                return res.status(403).json({ message: "Você não tem permissão para acessar esse recurso" })
-            }
-
-            req.user = {
-                id: Number(user_id)
-            }
-
-            return next();
-        } catch {
-            throw new AppError("JWT Token invalid", 401);
-        }
+        return next();
+    } catch {
+        throw new AuthenticationTokenGenerateError();
     }
 }
+
+export default doFilterAuth
