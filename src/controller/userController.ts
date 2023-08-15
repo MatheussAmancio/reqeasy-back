@@ -25,4 +25,5 @@ export class UserController {
         })
         return res.json(result.id)
     }
+    
 };
