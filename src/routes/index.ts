@@ -1,6 +1,6 @@
-import { Router } from "express"; 
-import {userRouter}  from "./user.routes"
-import {auth} from "./auth.routes"
+import { Router } from "express";
+import { userRouter } from "./user.routes"
+import { auth } from "./auth.routes"
 import { projectRouter } from "./project.routes";
 import doFilterAuth from '../middleware';
 

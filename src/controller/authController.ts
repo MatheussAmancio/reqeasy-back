@@ -28,8 +28,7 @@ export class AuthController {
 
         if (await this.hashPassUseCase.bcrypt.compare(password, result.password)) {
             const token = jwt.sign({ userId: result.id }, this.secretKey);
-            return res.status(200).json({token});
+            return res.status(200).json({ token });
         }
-
     }
 };
