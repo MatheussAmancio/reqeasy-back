@@ -6,7 +6,6 @@ import { AuthenticationTokenMissingException } from "../exceptions/Authenticatio
 async function doFilterAuth(req: any, res: any, next: any) {
 
     const authHeader = req.headers['authorization']
-    console.log(authHeader)
     if (!authHeader) {
         throw new AuthenticationTokenMissingException();
     }

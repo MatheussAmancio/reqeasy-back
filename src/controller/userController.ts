@@ -14,7 +14,6 @@ export class UserController {
     }
 
     async createUser(req: any, res: any) {
-        console.log(req.body)
         const { email, name, password } = req.body
         const result = await this.prisma.user.create({
             data: {

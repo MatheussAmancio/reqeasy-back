@@ -83,7 +83,6 @@ export class ProjectController {
     }
 
     async listProject(req: any, res: any) {
-        console.log(req.query)
         const { status, priority, title, skip, take } = req.query
         try {
             const result = await this.prisma.project.findMany({
