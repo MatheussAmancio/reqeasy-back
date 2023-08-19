@@ -1,17 +1,16 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { HashPassUseCase } from "../useCase/hashPass.usecase"
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
+import { AuthConfig } from "../config/auth";
 
 export class AuthController {
     prisma: PrismaClient
     hashPassUseCase: HashPassUseCase
-    secretKey: string
 
     constructor(prisma: PrismaClient) {
         this.prisma = prisma
         this.hashPassUseCase = new HashPassUseCase(bcrypt)
-        this.secretKey = process.env.SECRET_KEY || 'ASD!@AsD';
     };
 
     async signin(req: any, res: any) {
@@ -27,7 +26,8 @@ export class AuthController {
         }
 
         if (await this.hashPassUseCase.bcrypt.compare(password, result.password)) {
-            const token = jwt.sign({ userId: result.id }, this.secretKey);
+            const authConfig = new AuthConfig().getJwt()!;
+            const token = jwt.sign({ user_id: result.id }, authConfig.secret!, { expiresIn: authConfig.expiresIn!});
             return res.status(200).json({ token });
         }
     }

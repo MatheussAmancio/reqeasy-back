@@ -13,6 +13,9 @@ export class ProjectController {
 
     async createProject(req: any, res: any) {
         const { title, content, priority } = req.body
+        const userId = req.user.id
+        console.log(userId)
+        return
         try {
             const result = await this.prisma.project.create({
                 data: {

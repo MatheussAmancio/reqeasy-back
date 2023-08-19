@@ -11,3 +11,5 @@ routes.use("/api/users", userRouter)
 routes.use("/api/signin", auth)
 
 routes.use("/api/project", doFilterAuth, projectRouter)
+
+routes.use("/api/task", doFilterAuth, )
