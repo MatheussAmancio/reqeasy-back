@@ -18,7 +18,7 @@ model Project {
   content      String?
   priority     String
   status       String
-  user         User[]
+  users        User[]
   projectItens ProjectItem[]
 }
 
@@ -40,6 +40,22 @@ model ProjectItem {
   priority    String
   status      String
   parent_id   String?
-  project     Project  @relation(fields: [project_id], references: [id])
+  project     Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
   project_id  String
+}
+
+model ItemsLog {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  type       String
+  item_id    String
+  project_id String
+  user_id    String?
+}
+
+model InvitesProject {
+  id         String    @id @default(uuid())
+  createdAt  DateTime  @default(now())
+  project_id String
+  expires    DateTime?
 }

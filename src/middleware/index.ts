@@ -14,15 +14,11 @@ async function doFilterAuth(req: any, res: any, next: any) {
 
     try {
         const authConfig = new AuthConfig()
-        //const bla = jwt.verify(token, authConfig.getJwt()!.secret!);
-        const { sub: user_id } = jwt.verify(token, authConfig.getJwt()!.secret!);
-        console.log("a")
-
-        console.log(user_id)
-        req.user = {
-            id: user_id
+        const jwtResp = jwt.verify(token, authConfig.getJwt().secret);
+        req.header.user = {
+            id: Object.values(jwtResp)[0]
         }
-        console.log(req.user)
+
         return next();
     } catch {
 

@@ -15,6 +15,7 @@ export class AuthController {
 
     async signin(req: any, res: any) {
         const { email, password } = req.body
+
         const result = await this.prisma.user.findUnique({
             where: {
                 email: email
@@ -25,9 +26,13 @@ export class AuthController {
             return res.status(404).json({ message: "User not found" });
         }
 
+        if (!await this.hashPassUseCase.bcrypt.compare(password, result.password)) {
+            return res.status(404).json({ message: "Wrong Password" });
+        }
+
         if (await this.hashPassUseCase.bcrypt.compare(password, result.password)) {
-            const authConfig = new AuthConfig().getJwt()!;
-            const token = jwt.sign({ user_id: result.id }, authConfig.secret!, { expiresIn: authConfig.expiresIn!});
+            const authConfig = new AuthConfig().getJwt();
+            const token = jwt.sign({ user_id: result.id }, authConfig.secret, { expiresIn: authConfig.expiresIn });
             return res.status(200).json({ token });
         }
     }
