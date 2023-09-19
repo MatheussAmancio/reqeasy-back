@@ -10,11 +10,14 @@ const prisma = new PrismaClient()
 
 app.use(express.json())
 
-app.use(routes)
+const corsOptions = {
+    origin: '*',
+    methods: 'GET,POST,PUT,DELETE,PATCH,HEAD',
+    credentials: true
+}
+app.use(cors(corsOptions));
 
-app.use(cors<Request>({
-    origin: '*'
-}));
+app.use(routes)
 
 app.use((req, res, next) => {
     res.status(404)
