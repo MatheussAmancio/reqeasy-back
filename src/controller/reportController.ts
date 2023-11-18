@@ -9,7 +9,7 @@ export class ReportController {
     }
 
     async reportTaskUser(req: any, res: any) {
-        const { skip, take, startDate, endDate } = req.query
+        const { skip, take, startDate, endDate, priority, status } = req.query
         const userId = req.params.userId
         const skipPrisma = parseInt(skip) || 0
         const takePrisma = parseInt(take) || 10
@@ -42,6 +42,8 @@ export class ReportController {
                         gte: startDate ? new Date(startDate) : undefined,
                         lte: endDate ? new Date(endDate) : undefined,
                     },
+                    priority: priority ? priority : undefined,
+                    status: status ? status : undefined,
                 },
                 orderBy: {
                     createdAt: "asc"
@@ -95,7 +97,7 @@ export class ReportController {
 
 
     async reportTaskProject(req: any, res: any) {
-        const { skip, take, startDate, endDate } = req.query;
+        const { skip, take, startDate, endDate, priority, status } = req.query;
         const userId = req.params.userId;
         const skipPrisma = parseInt(skip) || 0;
         const takePrisma = parseInt(take) || 10;
@@ -128,6 +130,8 @@ export class ReportController {
                         gte: startDate ? new Date(startDate) : undefined,
                         lte: endDate ? new Date(endDate) : undefined,
                     },
+                    priority: priority ? priority : undefined,
+                    status: status ? status : undefined,
                 },
                 orderBy: {
                     createdAt: "asc"
@@ -190,12 +194,12 @@ export class ReportController {
     }
 
     async reportProjectStatus(req: any, res: any) {
-        const { skip, take, startDate, endDate } = req.query
-        const userId = req.params.userId
-        const skipPrisma = parseInt(skip) || 0
-        const takePrisma = parseInt(take) || 10
-        try {
+        const { skip, take, startDate, endDate } = req.query;
+        const userId = req.params.userId;
+        const skipPrisma = parseInt(skip) || 0;
+        const takePrisma = parseInt(take) || 10;
 
+        try {
             const project = await this.prisma.project.findMany({
                 skip: skipPrisma,
                 take: takePrisma,
@@ -208,7 +212,6 @@ export class ReportController {
                     createdAt: true,
                     users: {
                         select: {
-                            id: true,
                             name: true
                         }
                     }
@@ -227,71 +230,30 @@ export class ReportController {
                 orderBy: {
                     createdAt: "asc"
                 }
-            })
+            });
 
-            const projectsCounts = await Promise.all(
-                project.map(async (project) => {
-                    const projectCreated = await this.prisma.project.count({
-                        where: {
-                            users: {
-                                some: {
-                                    id: userId
-                                }
-                            },
-                            status: Status.CREATED
-                        },
-                    });
+            // Totalizadores para cada status
+            const totalStatusCounts: { [status: string]: number } = {
+                CREATED: 0,
+                PROCESSING: 0,
+                COMPLETED: 0,
+            };
 
-                    const projectCProcessing = await this.prisma.project.count({
-                        where: {
-                            users: {
-                                some: {
-                                    id: userId
-                                }
-                            },
-                            status: Status.PROCESSING
-                        },
-                    });
-
-                    const projectCompleted = await this.prisma.project.count({
-                        where: {
-                            users: {
-                                some: {
-                                    id: userId
-                                }
-                            },
-                            status: Status.COMPLETED
-                        },
-                    });
-
-                    const projectCancelled = await this.prisma.project.count({
-                        where: {
-                            users: {
-                                some: {
-                                    id: userId
-                                }
-                            },
-                            status: Status.CANCELED
-                        },
-                    });
-
-                    return {
-                        ...project,
-                        projectCreated,
-                        projectCProcessing,
-                        projectCompleted,
-                        projectCancelled,
-                    };
-                })
-            );
+            project.forEach((project) => {
+                const status = project.status;
+                if (status in totalStatusCounts) {
+                    totalStatusCounts[status]++;
+                }
+            });
 
             return res.json({
                 skip: parseInt(skip),
                 take: parseInt(take),
-                projects: projectsCounts
+                projects: project,
+                totalStatusCounts
             });
         } catch (error) {
-            return res.json(error).status(500)
+            return res.status(500).json(error);
         }
     }
 }

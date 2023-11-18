@@ -11,7 +11,7 @@ const statusMap = [
     },
     {
         from: Status.COMPLETED,
-        to: []
+        to: [Status.PROCESSING, Status.CANCELED]
     },
     {
         from: Status.CANCELED,

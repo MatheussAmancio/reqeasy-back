@@ -131,10 +131,6 @@ export class ProjectController {
                 return res.json({ errors: [{ message: "Project not found" }] }).status(404)
             }
 
-            if (!project) {
-                return res.json({ errors: [{ message: "Project not found" }] }).status(404)
-            }
-
             const userFound = project.users.filter(user => {
                 return user.id === userId
             })
@@ -178,6 +174,7 @@ export class ProjectController {
                 select: {
                     id: true,
                     title: true,
+                    content: true,
                     status: true,
                     priority: true,
                     createdAt: true
