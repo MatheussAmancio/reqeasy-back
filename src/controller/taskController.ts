@@ -26,11 +26,11 @@ export class TaskController {
                     id: projectId
                 }
             })
-            
+
             if (!project) {
                 return res.json({ errors: [{ message: "Project not found" }] }).status(404)
             }
-            
+
             const userFound = project.users.filter(user => {
                 return user.id === userId
             })
@@ -78,11 +78,11 @@ export class TaskController {
                     id: projectId
                 }
             })
-            
+
             if (!project) {
                 return res.json({ errors: [{ message: "Project not found" }] }).status(404)
             }
-            
+
             const userFound = project.users.filter(user => {
                 return user.id === userId
             })
@@ -141,11 +141,11 @@ export class TaskController {
                     id: projectId
                 }
             })
-            
+
             if (!project) {
                 return res.json({ errors: [{ message: "Project not found" }] }).status(404)
             }
-            
+
             const userFound = project.users.filter(user => {
                 return user.id === userId
             })
@@ -153,7 +153,7 @@ export class TaskController {
             if (!userFound.length) {
                 return res.json({ errors: [{ message: "User does not exists in project" }] }).status(404)
             }
-            
+
             const result = await this.prisma.projectItem.findUnique({
                 where: {
                     id: itemId
